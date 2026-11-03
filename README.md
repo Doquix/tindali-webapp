@@ -25,6 +25,15 @@ Open http://localhost:5173 and tap **Try a demo store** to load 18 products and 
 | Assistant retrieval | `src/rag.ts` | Builds a document per product and per day, ranks them with BM25 (with Taglish synonyms), and sends the store overview plus the top 8. |
 | Assistant answer | `server/index.ts` `/api/ask` | Claude Opus 5.5 at low effort, with server-side refusal fallbacks on. The API key stays on the server. |
 
+## Protecting the AI
+
+`/api/ask` spends your Anthropic credit, so it is guarded:
+
+- **Access code.** Every request needs an `X-Access-Code` header matching one of `ACCESS_CODES` in `.env` (comma-separated, one per store). The app asks for it once on the Ask AI screen. With no codes set, the assistant is off.
+- **Rate limit.** 20 questions per hour per IP, wrong codes included. Behind a host's proxy, set `TRUST_PROXY=1`.
+- **Spend limit.** Before deploying, set a monthly spend limit for the API key in the [Anthropic Console](https://console.anthropic.com/) (Settings, Limits). This caps the cost even if a code leaks.
+- **Key stays on the server.** CI fails if a key or its variable name shows up in the built app.
+
 ## Using the camera on a phone
 
 Browsers only allow the camera on `https://` or `localhost`. To test on a phone over Wi-Fi, serve the app over HTTPS (for example with a tunnel such as `cloudflared tunnel --url http://localhost:5173`), or type barcodes in the box under the camera.

@@ -19,3 +19,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: No API keys in the browser bundle
+        run: |
+          if grep -rEl "sk-ant-|ANTHROPIC_API_KEY|ACCESS_CODES" dist; then
+            echo "A secret or its name ended up in dist/. Keep it on the server."; exit 1
+          fi
