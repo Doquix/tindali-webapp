@@ -1,11 +1,13 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { getLastBackupAt } from "../backup";
 import { Icon } from "../components/Icon";
 import { db } from "../db";
 import { formatPeso } from "../money";
 import { loadDemoData } from "../seed";
 import { DAY_MS, salesBetween, startOfDay, stockLevel, summarize } from "../stats";
+import { backupIsStale, lastBackupText } from "./Backup";
 import { ProductRow } from "./Inventory";
 
 export default function Home() {
@@ -25,6 +27,7 @@ export default function Home() {
           <p className="muted">Add your products, scan to sell, and ask the AI what to restock.</p>
           <div className="list">
             <Link to="/inventory/new" className="btn btn-primary btn-block">Add my first product</Link>
+            <Link to="/backup" className="btn btn-block">Restore from a backup</Link>
             <button
               className="btn btn-block"
               disabled={loading}
@@ -48,6 +51,8 @@ export default function Home() {
     .filter((p) => stockLevel(p) !== "ok")
     .sort((a, b) => a.stock - b.stock)
     .slice(0, 5);
+  const lastBackupAt = getLastBackupAt();
+  const stale = backupIsStale(lastBackupAt);
   const dateText = new Date().toLocaleDateString("en-PH", { weekday: "long", month: "long", day: "numeric" });
 
   return (
@@ -85,6 +90,13 @@ export default function Home() {
       <Link to="/ai" className="card card-soft" style={{ display: "block", marginTop: 20, textDecoration: "none", color: "inherit" }}>
         <strong className="with-icon"><Icon name="sparkle" size={18} />Tanong kay Tindali</strong>
         <div className="small muted">Ask what to restock, what makes the most profit, or how this week went.</div>
+      </Link>
+
+      <Link to="/backup" className="row" style={{ marginTop: 12, minHeight: 56 }}>
+        <div className="row-main">
+          <div className="row-title" style={{ color: stale ? "var(--amber)" : undefined }}>{lastBackupText(lastBackupAt)}</div>
+          <div className="row-sub">{stale ? "Save a backup so you don't lose your store" : "Save or restore a backup file"}</div>
+        </div>
       </Link>
     </div>
   );

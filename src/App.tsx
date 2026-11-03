@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import { Icon } from "./components/Icon";
 import Assistant from "./pages/Assistant";
+import BackupPage from "./pages/Backup";
 import Checkout from "./pages/Checkout";
 import Home from "./pages/Home";
 import Inventory from "./pages/Inventory";
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/ai" element={<Assistant />} />
+        <Route path="/backup" element={<BackupPage />} />
       </Routes>
       <nav className="nav" aria-label="Main">
         <NavLink to="/" end>
