@@ -40,7 +40,7 @@ Browsers only allow the camera on `https://` or `localhost`. To test on a phone 
 
 ## Not built yet
 
-Utang (customer credit), user accounts and cloud sync/backup. Data currently lives only in the phone's browser storage, so clearing site data erases it.
+Utang (customer credit), user accounts and cloud sync. Data lives in the phone's browser storage; the app asks the browser to keep it, and **Backup** (from Home) saves the whole store to a JSON file that can be restored on any phone.
 
 ## Roadmap and how we work
 
