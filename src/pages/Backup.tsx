@@ -1,6 +1,7 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { BackupError, backupFileName, countRows, createBackup, getLastBackupAt, parseBackup, restoreBackup, setLastBackupAt, type Backup } from "../backup";
+import { useCart } from "../cart";
 import { Icon } from "../components/Icon";
 import { DAY_MS } from "../stats";
 
@@ -17,31 +18,53 @@ export const backupIsStale = (at: number | null, now = Date.now()) => at === nul
 const formatDate = (t: number) => new Date(t).toLocaleString("en-PH", { month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
 
 export default function BackupPage() {
+  const cart = useCart();
   const [lastAt, setLastAt] = useState(getLastBackupAt);
   const [persisted, setPersisted] = useState<boolean | null>(null);
   const [saving, setSaving] = useState(false);
   const [pending, setPending] = useState<Backup | null>(null);
+  // A download the page cannot see finish: the owner confirms the file arrived before it counts as a backup.
+  const [downloaded, setDownloaded] = useState<{ name: string; at: number } | null>(null);
   const [message, setMessage] = useState<{ text: string; error?: boolean } | null>(null);
 
   useEffect(() => {
     navigator.storage?.persisted?.().then(setPersisted, () => setPersisted(false));
   }, []);
 
+  function markBackedUp(at: number) {
+    setLastBackupAt(at);
+    setLastAt(at);
+  }
+
   async function save() {
     setSaving(true);
     setMessage(null);
+    setDownloaded(null);
     try {
       const now = Date.now();
-      const backup = await createBackup(now);
-      const url = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: "application/json" }));
+      const name = backupFileName(now);
+      const file = new File([JSON.stringify(await createBackup(now))], name, { type: "application/json" });
+
+      // The share sheet (Drive, Messenger, Files) reports success, so a backup is only recorded when it really went somewhere.
+      if (navigator.canShare?.({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: "Tindali backup" });
+          markBackedUp(now);
+          setMessage({ text: `Backup sent: ${name}.` });
+        } catch (err) {
+          if (err instanceof DOMException && err.name === "AbortError") setMessage({ text: "Backup not saved. Tap Save backup file to try again.", error: true });
+          else throw err;
+        }
+        return;
+      }
+
+      const url = URL.createObjectURL(file);
       const a = document.createElement("a");
       a.href = url;
-      a.download = backupFileName(now);
+      a.download = name;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
-      setLastBackupAt(now);
-      setLastAt(now);
-      setMessage({ text: `Saved ${a.download}. Keep it somewhere off this phone too, like Google Drive or a message to yourself.` });
+      setDownloaded({ name, at: now });
     } catch {
       setMessage({ text: "Could not make the backup. Please try again.", error: true });
     } finally {
@@ -66,8 +89,9 @@ export default function BackupPage() {
     if (!pending) return;
     try {
       await restoreBackup(pending);
-      setLastBackupAt(pending.exportedAt);
-      setLastAt(pending.exportedAt);
+      // Items scanned before the restore point at the old store's products and prices.
+      cart.clear();
+      markBackedUp(pending.exportedAt);
       setMessage({ text: `Restored ${countRows(pending, "products")} products and ${countRows(pending, "sales")} sales.` });
     } catch {
       setMessage({ text: "Restore failed. Nothing on this phone was changed.", error: true });
@@ -92,6 +116,16 @@ export default function BackupPage() {
           {saving ? "Saving…" : "Save backup file"}
         </button>
       </section>
+
+      {downloaded && (
+        <section className="card card-soft" style={{ marginBottom: 16 }} aria-label="Confirm download">
+          <p style={{ marginTop: 0 }}>Check your Downloads for <strong>{downloaded.name}</strong>. Is it there?</p>
+          <div className="list">
+            <button className="btn btn-primary btn-block" onClick={() => { markBackedUp(downloaded.at); setDownloaded(null); setMessage({ text: "Backed up. Keep a copy off this phone too, like Google Drive or a message to yourself." }); }}>Yes, I have the file</button>
+            <button className="btn btn-block" onClick={() => { setDownloaded(null); setMessage({ text: "Backup not saved. Tap Save backup file to try again.", error: true }); }}>No, it didn't save</button>
+          </div>
+        </section>
+      )}
 
       {message && (
         <p role="status" className={message.error ? "error" : "small"} style={{ marginTop: 0 }}>{message.text}</p>
