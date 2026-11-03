@@ -32,3 +32,9 @@ Browsers only allow the camera on `https://` or `localhost`. To test on a phone 
 ## Not built yet
 
 Utang (customer credit), user accounts and cloud sync/backup. Data currently lives only in the phone's browser storage, so clearing site data erases it.
+
+## Roadmap and how we work
+
+- [docs/MVP.md](docs/MVP.md): what v0.1.0 includes, the acceptance criteria for each feature, and the release test with real owners.
+- [CHANGELOG.md](CHANGELOG.md): user-visible changes, newest first.
+- One issue, one branch, one pull request into `main`. CI (typecheck, tests, build) must pass before merging.
