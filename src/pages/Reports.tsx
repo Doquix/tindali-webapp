@@ -39,7 +39,7 @@ export default function Reports() {
       <section className="card hero" style={{ marginTop: 16 }}>
         <div className="muted small">Profit</div>
         <div className="big-number">{formatPeso(total.profit)}</div>
-        <div className="small">Sales {formatPeso(total.revenue)} · Cost {formatPeso(total.cost)} · {total.itemsSold} items</div>
+        <div className="small meta"><span>Sales {formatPeso(total.revenue)}</span><span>Cost {formatPeso(total.cost)}</span><span>{total.itemsSold} items</span></div>
       </section>
 
       {days > 1 && (

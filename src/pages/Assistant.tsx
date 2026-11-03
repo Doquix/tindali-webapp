@@ -1,5 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Icon } from "../components/Icon";
 import { db } from "../db";
 import { retrieve } from "../rag";
 import { DAY_MS, startOfDay } from "../stats";
@@ -62,7 +63,7 @@ export default function Assistant() {
 
   return (
     <div className="page page-chat">
-      <div className="page-header"><h1>✦ Tanong kay Tindali</h1></div>
+      <div className="page-header"><h1 className="with-icon"><Icon name="sparkle" />Tanong kay Tindali</h1></div>
 
       {turns.length === 0 && (
         <div className="card card-soft" style={{ marginBottom: 16 }}>
@@ -80,7 +81,7 @@ export default function Assistant() {
         {turns.map((t, i) => (
           <div key={i} className={`bubble ${t.role === "user" ? "bubble-user" : "bubble-ai"}`} style={t.error ? { background: "var(--red-soft)", color: "var(--red)" } : undefined}>
             {t.text}
-            {t.sources && <div className="bubble-source">Based on: {t.sources.join(" · ")}</div>}
+            {t.sources && <div className="bubble-source">Based on: {t.sources.join(", ")}</div>}
           </div>
         ))}
         {busy && <div className="bubble bubble-ai muted">Checking your records…</div>}

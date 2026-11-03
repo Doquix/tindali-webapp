@@ -1,6 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Icon } from "../components/Icon";
 import { db } from "../db";
 import { formatPeso } from "../money";
 import { loadDemoData } from "../seed";
@@ -19,7 +20,7 @@ export default function Home() {
     return (
       <div className="page">
         <div className="empty">
-          <div className="empty-art" aria-hidden>🏪</div>
+          <div className="empty-art"><Icon name="store" size={56} /></div>
           <h1>Welcome to Tindali</h1>
           <p className="muted">Add your products, scan to sell, and ask the AI what to restock.</p>
           <div className="list">
@@ -52,16 +53,17 @@ export default function Home() {
   return (
     <div className="page">
       <p className="muted small" style={{ margin: 0 }}>{dateText}</p>
-      <h1 style={{ margin: "2px 0 16px", fontSize: 24 }}>Magandang araw! 👋</h1>
+      <h1 style={{ margin: "2px 0 16px", fontSize: 24 }}>Magandang araw!</h1>
 
-      <section className="card hero" aria-label="Today's profit">
-        <div className="muted small">Kita ngayon · Today's profit</div>
+      <section className="card hero" aria-label="Today’s profit">
+        <div className="muted small">Kita ngayon <span lang="en">(today’s profit)</span></div>
         <div className="big-number">{formatPeso(t.profit)}</div>
-        <div className="small">
-          Sales {formatPeso(t.revenue)} · Cost {formatPeso(t.cost)}
+        <div className="small meta">
+          <span>Sales {formatPeso(t.revenue)}</span>
+          <span>Cost {formatPeso(t.cost)}</span>
         </div>
         <div className="small muted" style={{ marginTop: 4 }}>
-          Yesterday's full day: {formatPeso(y.profit)} profit
+          Yesterday’s full day: {formatPeso(y.profit)} profit
         </div>
       </section>
 
@@ -81,7 +83,7 @@ export default function Home() {
       )}
 
       <Link to="/ai" className="card card-soft" style={{ display: "block", marginTop: 20, textDecoration: "none", color: "inherit" }}>
-        <strong>✦ Tanong kay Tindali</strong>
+        <strong className="with-icon"><Icon name="sparkle" size={18} />Tanong kay Tindali</strong>
         <div className="small muted">Ask what to restock, what makes the most profit, or how this week went.</div>
       </Link>
     </div>

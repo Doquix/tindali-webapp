@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../cart";
+import { Icon } from "../components/Icon";
 import { recordSale, type Payment } from "../db";
 import { formatPeso, parsePeso } from "../money";
 
@@ -26,7 +27,7 @@ export default function Checkout() {
   if (done) {
     return (
       <div className="page success">
-        <div className="success-icon" aria-hidden>✓</div>
+        <div className="success-icon"><Icon name="check" size={44} /></div>
         <h1>Sale saved</h1>
         <p className="muted">{formatPeso(done.total)}</p>
         {done.change > 0 && <p style={{ fontSize: 24 }}>Change: <strong>{formatPeso(done.change)}</strong></p>}
@@ -38,7 +39,7 @@ export default function Checkout() {
   if (cart.count === 0) {
     return (
       <div className="page empty">
-        <div className="empty-art" aria-hidden>🛒</div>
+        <div className="empty-art"><Icon name="cart" size={56} /></div>
         <p className="muted">No items yet.</p>
         <Link to="/scan" className="btn btn-primary">Scan a product</Link>
       </div>
@@ -48,7 +49,7 @@ export default function Checkout() {
   return (
     <div className="page">
       <div className="page-header">
-        <Link to="/scan" className="icon-btn" aria-label="Back">←</Link>
+        <Link to="/scan" className="icon-btn" aria-label="Back"><Icon name="back" /></Link>
         <h1>Checkout</h1>
       </div>
       <div className="list">

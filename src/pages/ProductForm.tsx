@@ -1,6 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Icon } from "../components/Icon";
 import { CATEGORIES, db, findByBarcode, type Category, type Product } from "../db";
 import { formatPeso, parsePeso, toPesoInput } from "../money";
 import { marginPercent } from "../stats";
@@ -115,7 +116,7 @@ export default function ProductForm() {
   return (
     <div className="page">
       <div className="page-header">
-        <Link to="/inventory" className="icon-btn" aria-label="Back">←</Link>
+        <Link to="/inventory" className="icon-btn" aria-label="Back"><Icon name="back" /></Link>
         <h1>{productId ? "Edit product" : "New product"}</h1>
       </div>
 

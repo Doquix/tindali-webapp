@@ -2,6 +2,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { lazy, Suspense, useCallback, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../cart";
+import { Icon } from "../components/Icon";
 import { db, findByBarcode, type Product } from "../db";
 import { formatPeso } from "../money";
 import { StockBadge } from "./Inventory";
@@ -42,8 +43,8 @@ export default function Scan() {
     <div className="page">
       {cart.count > 0 && (
         <Link to="/checkout" className="cart-pill">
-          <span>{cart.count} item{cart.count === 1 ? "" : "s"} · {formatPeso(cart.totalCentavos)}</span>
-          <span>Checkout →</span>
+          <span className="meta"><span>{cart.count} item{cart.count === 1 ? "" : "s"}</span><span>{formatPeso(cart.totalCentavos)}</span></span>
+          <span>Checkout</span>
         </Link>
       )}
 
@@ -62,7 +63,7 @@ export default function Scan() {
           <div className="chips" style={{ flexWrap: "wrap" }}>
             {noBarcode.map((p) => (
               <button key={p.id} className="chip" onClick={() => { setQty(1); setFound({ kind: "product", product: p }); }}>
-                {p.name} · {formatPeso(p.priceCentavos)}
+                <span className="meta"><span>{p.name}</span><span>{formatPeso(p.priceCentavos)}</span></span>
               </button>
             ))}
           </div>
@@ -80,12 +81,13 @@ export default function Scan() {
                   <div className="thumb" aria-hidden>{found.product.name.slice(0, 1)}</div>
                   <div className="row-main">
                     <div className="row-title" style={{ fontSize: 18 }}>{found.product.name}</div>
-                    <div className="row-sub">{found.product.size} · <StockBadge product={found.product} /></div>
+                    <div className="row-sub meta"><span>{found.product.size}</span><StockBadge product={found.product} /></div>
                   </div>
                 </div>
                 <div className="price-big" style={{ marginTop: 12 }}>{formatPeso(found.product.priceCentavos)}</div>
-                <div className="small muted">
-                  Cost {formatPeso(found.product.costCentavos)} · Profit {formatPeso(found.product.priceCentavos - found.product.costCentavos)} each
+                <div className="small muted meta">
+                  <span>Cost {formatPeso(found.product.costCentavos)}</span>
+                  <span>Profit {formatPeso(found.product.priceCentavos - found.product.costCentavos)} each</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "16px 0" }}>
                   <div className="stepper">
@@ -100,7 +102,7 @@ export default function Scan() {
               </>
             ) : (
               <div className="empty" style={{ padding: "8px 0" }}>
-                <div className="empty-art" aria-hidden>🔍</div>
+                <div className="empty-art"><Icon name="search" size={56} /></div>
                 <h3 style={{ margin: "4px 0" }}>Not in your store yet</h3>
                 <p className="muted small">Barcode {found.barcode}</p>
                 <Link to={`/inventory/new?barcode=${encodeURIComponent(found.barcode)}&from=scan`} className="btn btn-primary btn-block">Add new product</Link>

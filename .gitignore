@@ -3,3 +3,5 @@ dist
 .env
 .remember
 *.tsbuildinfo
+.hallmark
+.claude/skills

@@ -1,6 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Icon } from "../components/Icon";
 import { CATEGORIES, db, type Product } from "../db";
 import { formatPeso } from "../money";
 import { marginPercent, stockLevel } from "../stats";
@@ -21,7 +22,7 @@ export function ProductRow({ product }: { product: Product }) {
       <div className="thumb" aria-hidden>{product.name.slice(0, 1)}</div>
       <div className="row-main">
         <div className="row-title">{product.name}{product.size ? ` ${product.size}` : ""}</div>
-        <div className="row-sub"><StockBadge product={product} /> · {marginPercent(product)}% margin</div>
+        <div className="row-sub meta"><StockBadge product={product} /><span>{marginPercent(product)}% margin</span></div>
       </div>
       <div className="row-end">{formatPeso(product.priceCentavos)}</div>
     </Link>
@@ -58,7 +59,7 @@ export default function Inventory() {
       </div>
       {products && shown.length === 0 ? (
         <div className="empty">
-          <div className="empty-art" aria-hidden>📦</div>
+          <div className="empty-art"><Icon name="box" size={56} /></div>
           <p className="muted">{products.length === 0 ? "No products yet. Add one or scan a barcode." : "Nothing matches this filter."}</p>
         </div>
       ) : (

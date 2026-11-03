@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
+import { Icon } from "./components/Icon";
 import Assistant from "./pages/Assistant";
 import Checkout from "./pages/Checkout";
 import Home from "./pages/Home";
@@ -39,19 +40,19 @@ export default function App() {
       </Routes>
       <nav className="nav" aria-label="Main">
         <NavLink to="/" end>
-          <span className="nav-icon" aria-hidden>⌂</span>Home
+          <Icon name="home" />Home
         </NavLink>
         <NavLink to="/inventory">
-          <span className="nav-icon" aria-hidden>▤</span>Inventory
+          <Icon name="list" />Inventory
         </NavLink>
         <NavLink to="/scan" className="scan-fab" aria-label="Scan">
-          <span aria-hidden>⌁</span>
+          <Icon name="scan" size={28} />
         </NavLink>
         <NavLink to="/reports">
-          <span className="nav-icon" aria-hidden>▥</span>Reports
+          <Icon name="chart" />Reports
         </NavLink>
         <NavLink to="/ai">
-          <span className="nav-icon" aria-hidden>✦</span>Ask AI
+          <Icon name="sparkle" />Ask AI
         </NavLink>
       </nav>
     </div>

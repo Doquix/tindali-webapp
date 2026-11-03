@@ -1,6 +1,7 @@
 import { BrowserMultiFormatReader, type IScannerControls } from "@zxing/browser";
 import { BarcodeFormat, DecodeHintType } from "@zxing/library";
 import { useEffect, useRef, useState } from "react";
+import { Icon } from "./Icon";
 
 // Retail barcodes only, which keeps decoding fast on low-end phones.
 const HINTS = new Map<DecodeHintType, unknown>([
@@ -77,7 +78,7 @@ export default function Scanner({ paused, onDetected }: Props) {
           {hasTorch && (
             <div className="scanner-tools">
               <button className="icon-btn" onClick={toggleTorch} aria-label={torch ? "Turn off flashlight" : "Turn on flashlight"} aria-pressed={torch}>
-                {torch ? "◉" : "○"}
+                <Icon name="torch" />
               </button>
             </div>
           )}
