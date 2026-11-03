@@ -3,6 +3,7 @@ import express from "express";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { codeMatches, parseCodes, RateLimiter } from "./guard";
 
 if (existsSync(".env")) process.loadEnvFile(".env");
 
@@ -55,11 +56,29 @@ function attr(value: string): string {
 }
 
 const app = express();
+// Behind a host's proxy (Render, Railway, Fly), set TRUST_PROXY=1 so req.ip is the phone's IP, not the proxy's.
+app.set("trust proxy", Number(process.env.TRUST_PROXY ?? 0));
 app.use(express.json({ limit: "200kb" }));
 
 let client: Anthropic | null = null;
+const accessCodes = parseCodes(process.env.ACCESS_CODES);
+// Counts every attempt, wrong codes included, so guessing codes is slow too.
+const askLimiter = new RateLimiter(20, 60 * 60 * 1000);
 
 app.post("/api/ask", async (req, res) => {
+  const limit = askLimiter.hit(req.ip ?? "unknown");
+  if (!limit.ok) {
+    res.set("Retry-After", String(limit.retryAfterSec));
+    return res.status(429).json({ error: `That's 20 questions this hour. Try again in ${Math.ceil(limit.retryAfterSec / 60)} minutes.` });
+  }
+  // Fails closed: with no codes configured, nobody can spend the API key.
+  if (accessCodes.length === 0) {
+    return res.status(503).json({ error: "The AI is not set up yet. Add ACCESS_CODES to the .env file and restart the server." });
+  }
+  if (!codeMatches(req.get("X-Access-Code"), accessCodes)) {
+    return res.status(401).json({ error: "That access code didn't work. Check it with whoever set up Tindali for your store." });
+  }
+
   const input = parseAsk(req.body);
   if (!input) return res.status(400).json({ error: "Invalid request." });
   if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
